@@ -1,25 +1,47 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
 
 @theme {
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --color-primary: #22c55e; /* Green-500 */
-  --color-primary-dark: #16a34a; /* Green-600 */
+  --color-primary: #22c55e;
+  --color-primary-dark: #16a34a;
 }
 
 @layer base {
   body {
-    @apply font-sans bg-gray-50 text-gray-900;
+    @apply font-sans bg-white text-[#0B090A];
+  }
+
+  h1 {
+    @apply font-semibold text-[57.3px] leading-[65px] text-[#0B090A];
+  }
+
+  h2 {
+    @apply font-semibold text-[39.8px] leading-[47px] text-[#0B090A];
+  }
+
+  h3 {
+    @apply font-medium text-[27.6px] leading-[normal] text-[#0B090A];
+  }
+
+  h4 {
+    @apply font-medium text-[19.4px] leading-[normal] text-[#0B090A];
+  }
+
+  p {
+    @apply font-normal text-[16px] leading-[26px] text-[#808080];
   }
 }
 
-.grid-background {
-  background-image: 
-    linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
+.card-shadow {
+  box-shadow: 4px 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card-shadow-light {
+  box-shadow: 4px 10px 30px rgba(0, 0, 0, 0.03);
 }
 
 .glass-card {
-  @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
+  @apply bg-white rounded-[30px];
+  box-shadow: 4px 10px 30px rgba(0, 0, 0, 0.15);
 }

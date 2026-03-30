@@ -6,52 +6,77 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+// User model untuk authentication
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String
-  role      String   @default("admin")
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  password String
+  name  String?
+  role  String  @default("user") // admin, user
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
 }
 
-model Category {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  slug      String   @unique
-  berita    Berita[]
-}
-
+// Berita (News) model
 model Berita {
-  id          Int      @id @default(autoincrement())
-  title       String
-  slug        String   @unique
-  content     String
-  thumbnail   String?
-  published   Boolean  @default(false)
-  categoryId  Int
-  category    Category @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        Int     @id @default(autoincrement())
+  title     String
+  slug      String  @unique
+  content   String  @db.Text
+  thumbnail String?
+  published Boolean @default(false)
+  
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("berita")
 }
 
-model Gallery {
-  id          Int      @id @default(autoincrement())
-  title       String
-  imageUrl    String
-  description String?
-  createdAt   DateTime @default(now())
+// Kategori untuk news
+model Category {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  slug  String  @unique
+  berita Berita[]
+  
+  createdAt DateTime @default(now())
+
+  @@map("categories")
 }
 
+// Member model
 model Member {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   name      String
   position  String
   imageUrl  String?
-  period    String
-  order     Int      @default(0)
+  period    String?
+  order     Int     @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("members")
+}
+
+// Gallery model
+model Gallery {
+  id          Int     @id @default(autoincrement())
+  title       String
+  imageUrl    String
+  description String? @db.Text
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("gallery")
 }

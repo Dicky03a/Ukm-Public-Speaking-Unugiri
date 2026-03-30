@@ -16,14 +16,14 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <nav className="sticky top-0 z-50 bg-white border-b border-[#E0E0E0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="bg-primary p-1.5 rounded-lg">
-              <Mic2 className="text-white w-6 h-6" />
+          <Link to="/" className="flex items-center gap-3">
+            <div className="bg-primary p-2 rounded-lg">
+              <Mic2 className="text-white w-5 h-5" />
             </div>
-            <span className="font-bold text-xl tracking-tight text-gray-900">
+            <span className="font-semibold text-lg text-[#0B090A]">
               UKM <span className="text-primary">Public Speaking</span>
             </span>
           </Link>
@@ -34,8 +34,10 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  location.pathname === link.path ? "text-primary" : "text-gray-600"
+                className={`text-sm font-medium transition-colors ${
+                  location.pathname === link.path
+                    ? "text-primary font-semibold"
+                    : "text-[#808080] hover:text-primary"
                 }`}
               >
                 {link.name}
@@ -43,14 +45,17 @@ export default function Navbar() {
             ))}
             <Link
               to="/login"
-              className="bg-primary text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-primary-dark transition-all shadow-lg shadow-primary/20"
+              className="bg-primary text-white px-6 py-2.5 rounded-[30px] text-sm font-semibold hover:bg-primary-dark transition-all"
             >
               Admin
             </Link>
           </div>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden p-2 text-gray-600" onClick={() => setIsOpen(!isOpen)}>
+          <button
+            className="md:hidden p-2 text-[#808080] hover:text-primary"
+            onClick={() => setIsOpen(!isOpen)}
+          >
             {isOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -63,7 +68,7 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-b border-gray-100 overflow-hidden"
+            className="md:hidden bg-white border-b border-[#E0E0E0]"
           >
             <div className="px-4 pt-2 pb-6 space-y-1">
               {navLinks.map((link) => (
@@ -71,8 +76,10 @@ export default function Navbar() {
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-3 py-3 rounded-md text-base font-medium ${
-                    location.pathname === link.path ? "bg-primary/10 text-primary" : "text-gray-600 hover:bg-gray-50"
+                  className={`block px-3 py-3 rounded-[20px] text-base font-medium transition-colors ${
+                    location.pathname === link.path
+                      ? "bg-primary/10 text-primary"
+                      : "text-[#808080] hover:bg-gray-50"
                   }`}
                 >
                   {link.name}
@@ -81,7 +88,7 @@ export default function Navbar() {
               <Link
                 to="/login"
                 onClick={() => setIsOpen(false)}
-                className="block px-3 py-3 rounded-md text-base font-medium text-primary"
+                className="block px-3 py-3 rounded-[20px] text-base font-medium text-primary bg-primary/10 mt-2"
               >
                 Admin Login
               </Link>
@@ -92,3 +99,4 @@ export default function Navbar() {
     </nav>
   );
 }
+    

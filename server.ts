@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import multer from "multer";
 import dotenv from "dotenv";
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary } from "cloudinary";
 
 dotenv.config();
 
@@ -18,10 +18,14 @@ cloudinary.config({
 });
 
 const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+  log:
+    process.env.NODE_ENV === "development"
+      ? ["query", "error", "warn"]
+      : ["error"],
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-change-in-production";
+const JWT_SECRET =
+  process.env.JWT_SECRET || "fallback-secret-change-in-production";
 
 async function startServer() {
   const app = express();
@@ -36,7 +40,10 @@ async function startServer() {
     app.use((req, res, next) => {
       res.header("Access-Control-Allow-Origin", "http://localhost:5173");
       res.header("Access-Control-Allow-Credentials", "true");
-      res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+      res.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, OPTIONS",
+      );
       res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
       if (req.method === "OPTIONS") {
         return res.sendStatus(200);
@@ -46,19 +53,9 @@ async function startServer() {
   }
 
   // Multer configuration untuk file uploads
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "public/uploads/");
-    },
-    filename: (req, file, cb) => {
-      const sanitized = file.originalname.replace(/[^a-zA-Z0-9.-]/g, "-");
-      cb(null, Date.now() + "-" + sanitized);
-    },
-  });
-
   const upload = multer({
-    storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
       const allowed = ["image/jpeg", "image/png", "image/gif", "image/webp"];
       if (allowed.includes(file.mimetype)) {
@@ -70,7 +67,6 @@ async function startServer() {
   });
 
   // Static files
-  app.use("/uploads", express.static(path.join(process.cwd(), "public/uploads")));
 
   // =============== AUTH MIDDLEWARE ===============
   const authenticate = (req: any, res: any, next: any) => {
@@ -92,7 +88,7 @@ async function startServer() {
   };
 
   // =============== AUTH ROUTES ===============
-  
+
   // Register (opsional, bisa di-disable)
   app.post("/api/auth/register", async (req, res) => {
     try {
@@ -118,7 +114,12 @@ async function startServer() {
       });
 
       res.json({
-        user: { id: user.id, email: user.email, name: user.name, role: user.role },
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
       });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -147,7 +148,7 @@ async function startServer() {
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
         JWT_SECRET,
-        { expiresIn: "24h" }
+        { expiresIn: "24h" },
       );
 
       res.cookie("token", token, {
@@ -197,27 +198,34 @@ async function startServer() {
 
   // =============== FILE UPLOAD ===============
 
-app.post("/api/upload", authenticate, upload.single("image"), async (req: any, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
-    
-    const result = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        { folder: "ukm-public-speaking" },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
+  app.post(
+    "/api/upload",
+    authenticate,
+    upload.single("image"),
+    async (req: any, res) => {
+      try {
+        if (!req.file) {
+          return res.status(400).json({ error: "No file uploaded" });
         }
-      ).end(req.file.buffer);
-    });
 
-    res.json({ url: (result as any).secure_url });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
+        const result = await new Promise((resolve, reject) => {
+          cloudinary.uploader
+            .upload_stream(
+              { folder: "ukm-public-speaking" },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              },
+            )
+            .end(req.file.buffer);
+        });
+
+        res.json({ url: (result as any).secure_url });
+      } catch (error: any) {
+        res.status(500).json({ error: error.message });
+      }
+    },
+  );
 
   // =============== NEWS ROUTES ===============
   app.get("/api/news", async (req, res) => {
@@ -443,7 +451,10 @@ app.post("/api/upload", authenticate, upload.single("image"), async (req: any, r
   app.use((err: any, req: any, res: any, next: any) => {
     console.error("Error:", err);
     res.status(500).json({
-      error: process.env.NODE_ENV === "production" ? "Internal server error" : err.message,
+      error:
+        process.env.NODE_ENV === "production"
+          ? "Internal server error"
+          : err.message,
     });
   });
 

@@ -7,8 +7,15 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import multer from "multer";
 import dotenv from "dotenv";
+import { v2 as cloudinary } from 'cloudinary';
 
 dotenv.config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const prisma = new PrismaClient({
   log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
@@ -189,16 +196,28 @@ async function startServer() {
   });
 
   // =============== FILE UPLOAD ===============
-  app.post("/api/upload", authenticate, upload.single("image"), (req: any, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
-      }
-      res.json({ url: `/uploads/${req.file.filename}` });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+
+app.post("/api/upload", authenticate, upload.single("image"), async (req: any, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
     }
-  });
+    
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: "ukm-public-speaking" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(req.file.buffer);
+    });
+
+    res.json({ url: (result as any).secure_url });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
   // =============== NEWS ROUTES ===============
   app.get("/api/news", async (req, res) => {
